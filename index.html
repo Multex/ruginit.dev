@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ruginit</title>
+  <link rel="icon" href="assets/images/ruginit.gif">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="home">
+  <div class="wrap">
+    <div id="header"></div>
+
+    <div class="grid">
+      <main>
+
+        <!-- ============ HI / ABOUT ME ============ -->
+        <section class="panel">
+          <div class="panel-title"><span>~ hi</span><span id="updated"></span></div>
+          <div class="panel-body intro">
+            <div id="avatar"></div>
+            <div>
+              <p>I'm Ruginit, formerly <span class="hl">Multex_</span> on Twitch and many places. I study <span class="hl2">electronic engineering</span>, I teach robotics, and I'm still learning about everything.</p>
+              <p>22 years old! On my free time I make <span class="hl">vocaloid covers</span> and play <span class="hl">some games</span> </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ LATEST BLOG POSTS ============ -->
+        <section class="panel">
+          <div class="panel-title"><span>~ blog</span><a href="blog.html">all posts →</a></div>
+          <div class="panel-body" data-list="posts" data-limit="3"></div>
+        </section>
+
+        <!-- ============ PROJECT LIST ============ -->
+        <section class="panel">
+          <div class="panel-title"><span>~ personal projects</span><span>ruginit.xyz</span></div>
+          <div class="panel-body cards" data-list="projects"></div>
+        </section>
+
+        <!-- ============ THINGS I HOST (list lives in js/content.js) ============ -->
+        <section class="panel">
+          <div class="panel-title"><span>~ things i host</span><span>ruginit.xyz</span></div>
+          <div class="panel-body cards" data-list="hosting"></div>
+        </section>
+
+
+      </main>
+
+      <aside id="sidebar"></aside>
+    </div>
+
+    <div id="footer"></div>
+  </div>
+
+  <script src="js/content.js"></script>
+  <script src="js/site.js"></script>
+</body>
+</html>

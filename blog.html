@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>blog · ruginit</title>
+  <link rel="icon" href="assets/images/ruginit.gif">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="blog">
+  <div class="wrap">
+    <div id="header"></div>
+
+    <div class="grid">
+      <main>
+
+        <!-- ============ ALL POSTS (list lives in js/content.js → BLOG POSTS) ============ -->
+        <section class="panel">
+          <div class="panel-title"><span>~ all posts</span></div>
+          <div class="panel-body" data-list="posts"></div>
+        </section>
+
+      </main>
+
+      <aside id="sidebar"></aside>
+    </div>
+
+    <div id="footer"></div>
+  </div>
+
+  <script src="js/content.js"></script>
+  <script src="js/site.js"></script>
+</body>
+</html>
