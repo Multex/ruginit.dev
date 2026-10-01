@@ -43,11 +43,17 @@ function renderSidebar() {
 
   const quote = QUOTE ? panel("quote", `<p class="quote">"${QUOTE}"</p>`) : "";
 
+  // only on the home page, so it counts visits and not every page click
+  const counter = COUNTER && PAGE === "home"
+    ? panel("visitors", `<img class="counter" src="${COUNTER}" alt="visitor counter" loading="lazy">`)
+    : "";
+
   return `
     ${panel("elsewhere", `<div class="links">${socials}</div>`)}
     ${panel("now", now)}
     ${quote}
-    ${panel("buttons", `<div class="badges">${BUTTONS.map(renderButton).join("")}</div>`)}`;
+    ${panel("buttons", `<div class="badges">${BUTTONS.map(renderButton).join("")}</div>`)}
+    ${counter}`;
 }
 
 function panel(title, body) {

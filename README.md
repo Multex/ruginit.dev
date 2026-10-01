@@ -30,6 +30,7 @@ assets/             images, gifs, 88x31 buttons
 | change mood / studying / last cover  | `js/content.js` → `STATUS LINE`         |
 | change "now listening" etc.          | `js/content.js` → `NOW`                 |
 | change my social links               | `js/content.js` → `ELSEWHERE`           |
+| change/hide the visitor counter      | `js/content.js` → `VISITOR COUNTER`     |
 | add an 88x31 button                  | `js/content.js` → `88x31 BUTTONS`       |
 | set my avatar gif                    | put it in `assets/`, then `SITE.avatar` |
 | change the "hi" text                 | `index.html` → `HI / ABOUT ME`          |

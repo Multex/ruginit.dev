@@ -69,7 +69,15 @@ const NOW = [
 // ---------------------------------------------------------------------
 //  QUOTE (sidebar), set it to "" to hide it
 // ---------------------------------------------------------------------
-const QUOTE = "if I make a mistake in English please don't correct me I have no respect for this language";
+const QUOTE = "if i make a mistake in english please don't correct me i have no respect for this language";
+
+
+// ---------------------------------------------------------------------
+//  VISITOR COUNTER (sidebar, home page only), set it to "" to hide it
+//  it's just an image from count.ayaya.beauty: every load adds +1
+//  change "theme=" to any theme listed on https://count.ayaya.beauty/
+// ---------------------------------------------------------------------
+const COUNTER = "https://count.ayaya.beauty/@ruginit?theme=original-new";
 
 
 // ---------------------------------------------------------------------
@@ -164,6 +172,12 @@ const COVERS = [
     original: "Rex Orange County",
     date: "2026-09-19",
     url: "https://youtu.be/a3DI_nVPbf8",
+  },
+  {
+    title: "THE SHADE [Otomachi Una Cover]",
+    original: "Rex Orange County",
+    date: "2026-08-19",
+    url: "https://youtu.be/6MmZPHIKPj4",
   },
   {
     title: "Premier Inn [GUMI Cover]",

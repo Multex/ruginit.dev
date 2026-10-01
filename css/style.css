@@ -161,6 +161,24 @@ img { max-width: 100%; }
   font: 9px var(--font-pixel); color: var(--muted); text-decoration: none;
 }
 .badge img { display: block; image-rendering: pixelated; }
+.counter { display: block; margin: 0 auto; image-rendering: pixelated; }
+
+/* a loose image between panels (like the teto & gumi gif on covers) */
+/* remove the border line if you want it without a frame */
+.deco { display: block; max-width: 100%; margin: 16px auto 0; border: 1px solid var(--border); }
+.panel-body > .deco:first-child { margin-top: 0; }   /* inside a panel: no gap on top */
+
+/* videos/images side by side, centered.
+   SIZE: change the 48% (of the panel's width). 48% = two fill the row, smaller = smaller */
+.media-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 2%; }
+.media-row .deco { margin: 0; width: 48%; }
+
+/* text on the left, image on the right (like the hackermans on projects) */
+/* put the text inside a <div>, then the image after it */
+.side { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.side > div { flex: 1; }
+.side > div p:last-child { margin-bottom: 0; }
+.side .deco { margin: 0; max-width: 40%; }
 
 /* =====================================================================
    BLOG POST (everything inside <article class="prose">)
@@ -192,5 +210,6 @@ footer { margin-top: 32px; padding-top: 12px; border-top: 1px solid var(--border
   .grid { grid-template-columns: 1fr; }
   .cards, .stack { grid-template-columns: 1fr; }
   .intro { grid-template-columns: 1fr; }
+  .media-row .deco { width: 100%; margin-bottom: 10px; }
   .name { font-size: 28px; }
 }
