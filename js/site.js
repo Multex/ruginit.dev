@@ -95,12 +95,22 @@ function renderButton(b) {
   return `<a class="badge" href="${b.url ? link(b.url) : "#"}">${inner}</a>`;
 }
 
+function renderStack(s) {
+  const items = s.items.map((i) => `<span class="chip">${i}</span>`).join("");
+  return `
+    <div class="stack-group">
+      <div class="k">${s.group}</div>
+      <div class="chips">${items}</div>
+    </div>`;
+}
+
 const LISTS = {
   posts:    { items: [...POSTS].sort((a, b) => b.date.localeCompare(a.date)), render: renderPost },
   hosting:  { items: HOSTING,  render: renderCard },
   projects: { items: PROJECTS, render: renderCard },
   covers:   { items: [...COVERS].sort((a, b) => b.date.localeCompare(a.date)), render: renderCover },
   buttons:  { items: BUTTONS,  render: renderButton },
+  stack:    { items: STACK,    render: renderStack },
 };
 
 

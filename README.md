@@ -25,6 +25,7 @@ assets/             images, gifs, 88x31 buttons
 |--------------------------------------|-----------------------------------------|
 | add a thing I host                   | `js/content.js` → `THINGS I HOST`       |
 | add a project                        | `js/content.js` → `PROJECTS`            |
+| change "stuff i use" (home)          | `js/content.js` → `STUFF I USE`         |
 | add a cover                          | `js/content.js` → `VOCALOID COVERS`     |
 | change mood / studying / last cover  | `js/content.js` → `STATUS LINE`         |
 | change "now listening" etc.          | `js/content.js` → `NOW`                 |

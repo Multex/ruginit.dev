@@ -39,8 +39,8 @@ const NAV = [
 //  STATUS LINE
 // ---------------------------------------------------------------------
 const STATUS = [
-  { label: "studying",   value: "ccna - cisco" },
-  { label: "last cover", value: "television so far so good" },
+  { label: "studying",   value: "cisco ccna" },
+  { label: "last cover", value: "television/so far so good" },
   { label: "mood",       value: "tired but ok" },
 ];
 
@@ -125,6 +125,28 @@ const PROJECTS = [
   },
 ];
 
+
+// ---------------------------------------------------------------------
+//  STUFF I USE (home page)
+// ---------------------------------------------------------------------
+const STACK = [
+  {
+    group: "code",
+    items: ["JavaScript", "C++", "Python", "HTML/CSS", "TypeScript", "NodeJS", "git", ],
+  },
+  {
+    group: "electronics",
+    items: ["Arduino", "ESP32", "PlatformIO", "Raspberry Pi", "KiCad", "Proteus"],
+  },
+  {
+    group: "networking & servers",
+    items: ["Linux", "Cisco", "self-hosting"],
+  },
+  {
+    group: "music & video",
+    items: ["FL Studio", "Synthesizer V", "OBS Studio"],
+  },
+];
 
 
 // ---------------------------------------------------------------------
