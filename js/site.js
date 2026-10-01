@@ -130,7 +130,11 @@ fill("header", renderHeader());
 fill("sidebar", renderSidebar());
 fill("footer", renderFooter());
 fill("updated", `updated ${SITE.updated}`);
-fill("avatar", SITE.avatar ? `<img src="${link(SITE.avatar)}" alt="">` : placeholder("your gif"));
+// .mp4/.webm avatars play like a gif (muted, looping), anything else is an image
+const avatar = /\.(mp4|webm)$/i.test(SITE.avatar)
+  ? `<video src="${link(SITE.avatar)}" autoplay loop muted playsinline></video>`
+  : `<img src="${link(SITE.avatar)}" alt="">`;
+fill("avatar", SITE.avatar ? avatar : placeholder("your gif"));
 
 // any <div data-list="hosting"></div> gets filled with that list
 // add data-limit="3" to only show the first 3
