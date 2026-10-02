@@ -95,7 +95,7 @@ const POSTS = [
   },
   {
     title: "fixing an XPG Gammix S70 Blade when the vendor tool can't see it",
-    date: "2026-08-23",
+    date: "2026-10-01",
     tags: ["hardware", "linux", "nvme"],
     url: "blog/xpg-fix.html",
   },
