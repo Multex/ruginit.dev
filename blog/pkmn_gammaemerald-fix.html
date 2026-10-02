@@ -4,6 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>fixing Pokemon Gamma Emerald save bug · ruginit</title>
+  <meta name="description" content="Saved inside a Pokemon Center and now Gamma Emerald loads forever? Your save is fine. Here's the fix, with or without code.">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="ruginit">
+  <meta property="og:title" content="Pokemon Gamma Emerald: fix for the stuck in loading screen">
+  <meta property="og:description" content="fixing the infite loading screen bug on Pokemon Gamma Emerald">
+  <meta property="og:url" content="https://ruginit.xyz/blog/pkmn_gammaemerald-fix.html">
+  <meta property="og:image" content="https://ruginit.xyz/assets/og/gamma-emerald.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#ff9ecf">
   <link rel="icon" href="../assets/images/ruginit.gif">
   <link rel="stylesheet" href="../css/style.css">
 </head>
@@ -25,7 +34,7 @@
             <div class="tldr">
               <div class="label">tl;dr: just give me my save back</div>
               <p><b>Why:</b> you saved inside a building (for me, the Slateport Pokemon Center) and the game waits forever for the floor to load.<br>
-              <b>Fix:</b> move your position in the save to the Pokémon Center's respawn tile. You can do it in the browser with the <a href="https://pge.angehell.com/">pge save editor</a>, no code:</p>
+              <b>Fix:</b> move your position in the save to the Pokemon Center's respawn tile. You can do it in the browser with the <a href="https://pge.angehell.com/">pge save editor</a>, no code:</p>
               <ol>
                 <li><b>Back up</b> the whole <code>%LOCALAPPDATA%\PokemonEmerald\Saved\.ged</code> folder.</li>
                 <li>Open the biggest <code>.dat</code> in there (~1.7 MB) in pge.</li>
@@ -42,7 +51,7 @@ PlayerLocation_0      x = -34048    y = 146624    ← before (stuck)
               <p><b>Tested:</b> I did this with pge on a copy of my old stuck save and it loaded fine. The first time, I did the same edit with a custom script instead (that's the rest of this post).</p>
             </div>
 
-            <p>I was ~12 hours into <b>Pokemon Gamma Emerald</b> (the Unreal Engine fan remake), saved inside the <b>Slateport Pokemon Center</b>, restarted the game by accident, and... infinite loading screen. Forever. Forums and some people on the game's Discord server said it could be fixed by moving your position in the save to somewhere outside the Pokémon Center, and that mods had done it for other people. But nobody answered me, and I had no idea how to edit the save.</p>
+            <p>I was ~12 hours into <b>Pokemon Gamma Emerald</b> (the Unreal Engine fan remake), saved inside the <b>Slateport Pokemon Center</b>, restarted the game by accident, and... infinite loading screen. Forever. Forums and some people on the game's Discord server said it could be fixed by moving your position in the save to somewhere outside the Pokemon Center, and that mods had done it for other people. But nobody answered me, and I had no idea how to edit the save.</p>
 
             <img class="deco" src="../assets/images/blog/gamma-fix/discordss.png" width="55%" alt="my 'Stuck in loading screen' post in the Gamma Emerald Discord, with no replies">
 
@@ -98,7 +107,7 @@ SavedRoutePath   = /Game/BPS/ROUTES/Route_PokeCenter_Slateport
 bIsInside        = true
 PlayerLocation   = x -34048, y 146624, z 222.67
 LastPokeCenterTile = X -541, Y 2294</code></pre>
-            <p>So the game knows I'm <i>inside</i> the Slateport Pokémon Center. The game's own <a href="https://undreamedpanic.itch.io/gamma-emerald-demo/devlog/945486/demo-v2101">devlog</a> talks about loading screens waiting for "the floor" to be ready, and about having to hand-place collisions. Our guess: the tile I saved on never confirms its floor, so the loading screen waits forever. That matches what people on Discord said: move the player and it loads.</p>
+            <p>So the game knows I'm <i>inside</i> the Slateport Pokemon Center. The game's own <a href="https://undreamedpanic.itch.io/gamma-emerald-demo/devlog/945486/demo-v2101">devlog</a> talks about loading screens waiting for "the floor" to be ready, and about having to hand-place collisions. Our guess: the tile I saved on never confirms its floor, so the loading screen waits forever. That matches what people on Discord said: move the player and it loads.</p>
             <p>Claude also noticed that the coordinates are exact multiples of 64, so <b>1 tile = 64 Unreal units</b>. My position was tile (-532, 2291).</p>
             <p>(Side quest that went nowhere: it tried to get the list of all maps from the game's <code>.pak</code> file, but that's encrypted too and the key isn't easy to find, so it dropped that and moved on.)</p>
 
@@ -131,12 +140,12 @@ LastPokeCenterTile = X -541, Y 2294</code></pre>
               <li>Community tools are gold. The key and the format were already figured out by people who share their stuff. Credit to pge and gammaeditor.</li>
               <li>"Convert to JSON and back" sounds lossless, and it isn't always. Test it.</li>
               <li>Smallest change first. A fix that moves you a few tiles is better than one that rewrites half your save.</li>
-              <li>Don't save inside Pokémon Centers in this game. lol.</li>
+              <li>Don't save inside Pokemon Centers in this game. lol.</li>
             </ul>
 
             <p>If your Gamma Emerald save is stuck loading and you're not sure what to do, tell me and I'll try to help.</p>
 
-            <img class="deco" src="../assets/images/blog/gamma-fix/pkmn.webp" width="100%" alt="Gamma Emerald title screen (v1.13.1): the player and her team of pixel-art Pokémon in the rain, Rayquaza glowing in the background">
+            <img class="deco" src="../assets/images/blog/gamma-fix/pkmn.webp" width="100%" alt="Gamma Emerald title screen (v1.13.1): the player and her team of pixel-art Pokemon in the rain, Rayquaza glowing in the background">
 
             <!-- ============ YOUR POST ENDS HERE ============ -->
 

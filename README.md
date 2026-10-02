@@ -43,6 +43,15 @@ Adding something = copy the `{ ... },` block above, paste, edit. Mind the commas
 1. Copy `blog/_template.html` → `blog/my-post.html`
 2. Write between `YOUR POST STARTS HERE` and `YOUR POST ENDS HERE`
 3. Add it to `POSTS` in `js/content.js` so it shows up in the lists
+4. Change the link preview tags at the top of the file (`og:title`,
+   `description`, `og:url`). Optional: a 1200x630 `.jpg` in `assets/og/` for `og:image`
+
+## Link previews (Discord, Twitter...)
+
+Every page has `og:` meta tags in its `<head>`. They have to be written in the
+html (Discord doesn't run js, so `site.js` can't make them). They use full
+`https://ruginit.xyz/...` urls, so if the domain changes, search and replace
+`https://ruginit.xyz/` in all .html files. Default image: `assets/og/default.jpg`.
 
 ## Adding a new page
 
