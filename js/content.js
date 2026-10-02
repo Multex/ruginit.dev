@@ -93,6 +93,12 @@ const POSTS = [
     tags: ["meta"],
     url: "blog/hello-world.html",
   },
+  {
+    title: "fixing an XPG Gammix S70 Blade when the vendor tool can't see it",
+    date: "2026-08-23",
+    tags: ["hardware", "linux", "nvme"],
+    url: "blog/xpg-fix.html",
+  },
 ];
 
 

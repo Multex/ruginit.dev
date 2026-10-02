@@ -194,6 +194,8 @@ img { max-width: 100%; }
 .prose code { font: 13px var(--font-mono); background: var(--panel-head); padding: 1px 5px; color: var(--pink); }
 .prose pre { background: #0a0810; border: 1px solid var(--border); padding: 12px 14px; overflow-x: auto; }
 .prose pre code { background: none; padding: 0; color: var(--text); }
+/* small centered line under an image, for credits: <p class="credit">art by ...</p> */
+.prose .credit { margin-top: -8px; text-align: center; font: 12px var(--font-mono); color: var(--dim); }
 .prose hr { border: 0; border-top: 1px dashed var(--border); margin: 24px 0; }
 
 .back { display: inline-block; margin-top: 20px; font: 12px var(--font-pixel); text-decoration: none; }

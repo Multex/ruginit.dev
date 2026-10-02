@@ -14,31 +14,132 @@
     <div class="grid">
       <main>
         <section class="panel">
-          <div class="panel-title"><span>~ blog</span><span>2026-01-01</span></div>
+          <div class="panel-title"><span>~ blog</span><span>2026-08-23</span></div>
           <article class="panel-body prose">
 
             <!-- ============ YOUR POST STARTS HERE ============ -->
-            <h1>post title</h1>
-            <div class="meta">2026-01-01 · #tag</div>
+            <h1>fixing an XPG Gammix S70 Blade when the vendor tool can't see it</h1>
+            <div class="meta">2026-08-23 · #hardware #linux #nvme</div>
 
-            <p>Normal paragraph. You can do <b>bold</b>, <i>italic</i>, <a href="https://example.com">links</a> and <code>inline code</code>.</p>
+            <p>A friend's <b>XPG Gammix S70 Blade</b> (1 TB, InnoGrit IG5236 controller) stopped working properly. Windows still showed it, but ADATA's own <b>SSD ToolBox</b> didn't list it at all, so there was no way to update the firmware the normal way. We fixed it in one very long night over a Discord call, with Qwen helping us think. This is what we did, in case someone else has the same drive and the same problem.</p>
 
-            <h2>A section title</h2>
-            <p>Another paragraph.</p>
+            <blockquote>Flashing firmware can brick a drive for good. This is what worked for <i>us</i>, on <i>this</i> model, and the drive's data was already gone. Don't copy it blindly, and don't flash anything you haven't checked is the right image.</blockquote>
 
-            <h3>A smaller title</h3>
+            <img class="deco" src="../assets/images/blog/xpg-fix/qwen.jpg" width="65%" alt="Meme: smug anime girl labeled Qwen 3.8 27B telling an annoyed girl labeled Opus 4.6 that she's smarter and can run on your computer, next to a benchmark bar chart">
+            <p class="credit">art by <a href="https://x.com/Kedr_bit">Kedr (@Kedr_bit)</a></p>
+
+            <h2>What was wrong</h2>
             <ul>
-              <li>a list</li>
-              <li>of things</li>
+              <li>Disk Management showed the drive, with a tiny "1 MB unassigned" at the end (that part is normal, it's just alignment).</li>
+              <li>ADATA SSD ToolBox showed an empty drive list.</li>
+              <li>The official updater (<code>FWUpdate_3.2.J.PJ.exe</code>) didn't list the drive either.</li>
+              <li>The drive was on firmware <b>3.2.J.JE</b>, and the fix was <b>3.2.J.PJ</b>.</li>
+              <li>Under Linux, the drive only appeared after booting with <code>nvme_core.multipath=0</code>.</li>
+            </ul>
+            <p>What started all this was a forum post (in Spanish) that my friend found. It says drives on firmware <b>3.2.J.P0</b> go read-only after the July Windows Update, and that flashing <b>3.2.J.PJ</b> with the ADATA ToolBox revives them, as long as you plug the dead drive into a working PC as a secondary drive. Another user in the thread posted a CrystalDiskInfo screenshot of the same thing, with the "Media has been placed in Read Only Mode" warning.</p>
+            
+            <img class="deco" src="../assets/images/blog/xpg-fix/post.webp" width="100%" alt="the solotodo forum post about the read-only bug">
+            <p>Source: <a href="https://www.solotodo.cl/products/127680-a-data-xpg-gammix-s70-blade-1-tb-agammixs70b-1t-cs">the thread on Solotodo</a></p>
+
+            <p>Ours was a bit different: it was on JE instead of P0, <code>nvme smart-log</code> showed <code>critical_warning : 0</code>, and the ToolBox never listed it, so the forum's fix didn't work as written. Thanks microslop.</p>
+
+            <h2>Step 1: ask ADATA's server for the firmware</h2>
+            <p>The ToolBox never bundles the firmware, it downloads it. So I took the installer apart on my own PC (Linux) to see where it asks:</p>
+            <pre><code>unzip ADATA_SSDToolBoxSetup_v6.2.3.zip
+innoextract ADATA_SSDToolBoxSetup_v6.2.3.exe
+cd app
+cat SSDToolBox.exe.config</code></pre>
+            <p>The config file lists the update API:</p>
+            <pre><code>&lt;add key="ApiFwVersion" value="https://webapi2.adata.com/ssd_api/ssdFwUpdate" /&gt;</code></pre>
+            <p>To learn what it sends, I decompiled the ToolBox with ILSpy (it's a .NET program):</p>
+            <pre><code>sudo pacman -S dotnet-sdk
+dotnet tool install --global ilspycmd
+ilspycmd SSDToolBox.exe -p -o decompiled_exe</code></pre>
+            <p>The decompiled <code>CheckFwUpdate</code> just does a GET with the drive's serial number and current firmware, and the answer is split on <code>!</code>:</p>
+            <pre><code>curl -k -s "https://webapi2.adata.com/ssd_api/ssdFwUpdate?SSD_Serial_Number=&lt;DRIVE_SERIAL&gt;&amp;SSD_Inside_Firmware=3.2.J.JE"
+
+Y!Y002!https://webapi3.adata.com/storage/SSD/SSDFWupdate/INNOGRIT/IG5236CAA_HY/FWUpdater_32JPJ.zip!MES_OK</code></pre>
+            
+            <p><code>&lt;DRIVE_SERIAL&gt;</code> is a placeholder. I'm not publishing my friend's real serial and you shouldn't publish yours either. But you do need to put your own drive's serial in the request (<code>SN</code> column of <code>sudo nvme list</code>, or <code>sudo nvme id-ctrl /dev/nvme0 | grep ^sn</code>), and your own current firmware in <code>SSD_Inside_Firmware</code> (whatever <code>nvme list</code> shows as FW Rev: JE in our case, P0 in the forum's). The server compares the firmware to decide if an update exists, and it <i>probably</i> uses the serial to choose which NAND variant's firmware to serve: the <code>_HY</code> in the URL and <code>Hynix3DV7</code> in the zip name mean this drive got the Hynix build. We never tested it with a different serial, so that part is a guess from the naming. But if it's true, asking with someone else's serial could give you an image meant for different NAND, and flashing that can brick the drive for real. Same reason to never flash a <code>.fw</code> a stranger posted: query with your own serial, then verify the file like we did (size + <code>strings</code>).</p>
+            <p>That third field is the download link for the PJ updater. (I needed <code>-k</code> because my machine didn't trust their certificate chain. That turns off TLS verification, so only do it for something like this, and check what you download.)</p>
+
+            <h2>Step 2: the firmware is hidden inside the updater</h2>
+            <p>The zip only contains <code>FWUpdate_3.2.J.PJ.exe</code> and a PowerPoint. No <code>.bin</code> anywhere. But 7-Zip can open the .exe like an archive:</p>
+            <pre><code>7z x FWUpdate_3.2.J.PJ.exe -oFWExtracted
+cd FWExtracted/.rsrc/SCRIPTZIP
+file 1000      # Zip archive data, method=deflate
+cp 1000 payload.zip</code></pre>
+            <p>That <code>1000</code> resource is a zip with 8 files, including the firmware (a <code>.fw</code> of 933,888 bytes). But every tool refused to open it: <code>unzip</code> said "bad zipfile offset", <code>7z</code> said "not an archive", and <code>zip -FF</code> found the file list but "no local entry" for anything.</p>
+
+            <h2>Step 3: rebuilding the broken zip</h2>
+            <p>The central directory was fine, but the entries' real data didn't start exactly where it said. So we wrote a small Python script that reads the file list, then for each file tries to inflate starting a few bytes later each time until the output matches the expected size. The offsets turned out to be between 57 and 209 bytes off. Our first version didn't skip anything and produced garbage, the second one worked on all 8 files:</p>
+            
+            <pre><code>import zlib, struct, os
+data = open('payload.zip','rb').read()
+eocd = data.rfind(b'PK\x05\x06')
+count = struct.unpack('&lt;H', data[eocd+10:eocd+12])[0]
+off = struct.unpack('&lt;I', data[eocd+16:eocd+20])[0]
+os.makedirs('out2', exist_ok=True)
+for i in range(count):
+    assert data[off:off+4] == b'PK\x01\x02'
+    method, = struct.unpack('&lt;H', data[off+10:off+12])
+    csize,  = struct.unpack('&lt;I', data[off+20:off+24])
+    usize,  = struct.unpack('&lt;I', data[off+24:off+28])
+    nlen,   = struct.unpack('&lt;H', data[off+28:off+30])
+    elen,   = struct.unpack('&lt;H', data[off+30:off+32])
+    clen,   = struct.unpack('&lt;H', data[off+32:off+34])
+    loff,   = struct.unpack('&lt;I', data[off+42:off+46])
+    name = data[off+46:off+46+nlen].decode('utf8','replace')
+    out = None; skip_found = -1
+    if method == 8:
+        for skip in range(0, 512):
+            try:
+                d = zlib.decompressobj(-15)
+                cand = d.decompress(data[loff+skip:loff+skip+csize+64])
+                if len(cand) == usize:
+                    out = cand; skip_found = skip; break
+            except Exception:
+                pass
+    else:
+        out = data[loff:loff+csize]; skip_found = 0
+    if out is None:
+        print('FAILED', name)
+    else:
+        safe = name.replace('/','_').replace('+','_')
+        open(f'out2/{safe}','wb').write(out)
+        print(f'OK skip={skip_found} {name} -&gt; {len(out)}')
+    off += 46 + nlen + elen + clen</code></pre>
+
+            <p>To check we had the right file, <code>strings</code> on the <code>.fw</code> showed <code>3.2.J.PJ@rainier</code>, and its size matched what the zip said it should be. We renamed it to <code>pj.fw</code> (the name doesn't matter) and compared SHA-256 on both PCs before using it.</p>
+            <p>I'm not hosting the firmware here since it's ADATA's file, but with the steps above you can get it yourself.</p>
+
+            <h2>Step 4: flashing it from a Linux live USB</h2>
+            <p>On my friend's PC we booted a CachyOS live ISO from a Ventoy stick. On the ISO's own GRUB menu (not Ventoy's), press <code>e</code>, add <code>nvme_core.multipath=0</code> at the end of the <code>linux</code> line, and boot with Ctrl+X. Then:</p>
+            <pre><code>sudo nvme list                 # check which device is the XPG!
+sudo nvme fw-log /dev/nvme0
+sudo nvme fw-download /dev/nvme0 -f pj.fw
+sudo nvme fw-commit /dev/nvme0 --slot=1 --action=1</code></pre>
+
+            <p>Why that parameter: the drive's identify data reports <code>mnan : 0</code> (maximum number of allowed namespaces), which is an invalid value. Our best guess is that kernels with NVMe multipath enabled reject it and drop the drive at probe, so it never appears at all. We didn't capture the exact <code>dmesg</code> error to confirm it, but the parameter is what made the drive show up. <code>nvme_core.multipath=0</code> turns that subsystem off. That would also explain why Disk Management always saw the drive while Linux saw nothing.</p>
+
+            <p>It said "Firmware download success" and "Success committing firmware", on the first try. Then a <b>full power off</b> (not a restart), and after booting again <code>nvme list</code> finally said <code>3.2.J.PJ</code>. My message at that moment was "IT SAYS PJ WE DID IT!!!!"</p>
+
+            <h2>Step 5: the drive still looked dead (for a bit)</h2>
+            <p>Right after the flash, mounting the old NTFS partition failed, <code>ntfsfix</code> failed and reads gave I/O errors. The same thing had happened earlier in the night: after any failed write, the drive stayed unresponsive until a full cold boot. So after another power-off we just formatted it. It was only a games drive, so nothing important was lost:</p>
+            <pre><code>sudo mkfs.ntfs -Q -f -L Juegos /dev/nvme0n1p2     # double check the device name first!
+sudo mkdir -p /mnt/xpg
+sudo mount -t ntfs3 /dev/nvme0n1p2 /mnt/xpg</code></pre>
+            <p>(That <code>mkdir</code> was needed because the live session had forgotten the mount folder, which looked like another failure but wasn't.) Then he booted Windows, created a folder, and it worked. He started reinstalling his games.</p>
+
+            <h2>What I learned</h2>
+            <ul>
+              <li>Vendor tools usually just talk to a web API. If you can read the config and decompile the program, you can ask it yourself.</li>
+              <li>Corrupted zip files are sometimes fixable: the central directory was fine, only the offsets were wrong.</li>
+              <li>Qwen was great for ideas but confidently wrong a few times. Check its claims with real output. BUT, overall a great helper.</li>
+              <li>Doing this at 4 AM over Discord with a friend is weirdly fun.</li>
             </ul>
 
-            <pre><code>code block
-for terminal commands and stuff</code></pre>
-
-            <blockquote>a quote or a note</blockquote>
-
-            <!-- images: put them in assets/ and use ../assets/name.png -->
-            <!-- <img src="../assets/something.png" alt="what it is"> -->
+            <p>If you have the same drive and get stuck, tell me what you see and I'll try to help.</p>
 
             <!-- ============ YOUR POST ENDS HERE ============ -->
 
