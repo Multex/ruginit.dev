@@ -110,11 +110,14 @@ function renderStack(s) {
     </div>`;
 }
 
+// newest date first; on the same date, the one added last in content.js goes first
+const newestFirst = (list) => [...list].reverse().sort((a, b) => b.date.localeCompare(a.date));
+
 const LISTS = {
-  posts:    { items: [...POSTS].sort((a, b) => b.date.localeCompare(a.date)), render: renderPost },
+  posts:    { items: newestFirst(POSTS),  render: renderPost },
   hosting:  { items: HOSTING,  render: renderCard },
   projects: { items: PROJECTS, render: renderCard },
-  covers:   { items: [...COVERS].sort((a, b) => b.date.localeCompare(a.date)), render: renderCover },
+  covers:   { items: newestFirst(COVERS), render: renderCover },
   buttons:  { items: BUTTONS,  render: renderButton },
   stack:    { items: STACK,    render: renderStack },
 };
