@@ -30,9 +30,17 @@
             <h1>fixing an XPG Gammix S70 Blade when the vendor tool can't see it</h1>
             <div class="meta">2026-10-01 · #hardware #linux #nvme<br>the fix itself: night of 2026-08-22 → 08-23</div>
 
+            <!-- TL;DR box: the short version, for people who land here from google -->
+            <div class="tldr">
+              <div class="label">tl;dr</div>
+              <p><b>Symptoms:</b> XPG Gammix S70 Blade on firmware <code>3.2.J.JE</code>. Windows still sees it, but ADATA SSD ToolBox and the official firmware updater don't list it at all.</p>
+              <p><b>What fixed it:</b> we got firmware <code>3.2.J.PJ</code> straight from ADATA's update server, dug the <code>.fw</code> file out of the updater (its zip was broken, so we rebuilt it), and flashed it with <code>nvme-cli</code> from a Linux live USB booted with <code>nvme_core.multipath=0</code>.</p>
+              <p><b>This is not a tutorial.</b> There's no short version of this one. It's what worked for us, how we did it, and how you could do the same if you have the same problem. If you're not really into computers, give this page to your AI of choice and let it help you with your exact drive. That alone saves a lot of time. You can also do it all by hand.</p>
+            </div>
+
             <p>A friend's <b>XPG Gammix S70 Blade</b> (1 TB, InnoGrit IG5236 controller) stopped working properly. Windows still showed it, but ADATA's own <b>SSD ToolBox</b> didn't list it at all, so there was no way to update the firmware the normal way. We fixed it in one very long night over a Discord call, with Qwen helping us think. This is what we did, in case someone else has the same drive and the same problem.</p>
 
-            <blockquote>Flashing firmware can brick a drive for good. This is what worked for <i>us</i>, on <i>this</i> model, and the drive's data was already gone. Don't copy it blindly, and don't flash anything you haven't checked is the right image.</blockquote>
+            <blockquote class="warn">Flashing firmware can brick a drive for good. This is what worked for <i>us</i>, on <i>this</i> model, and the drive's data was already gone. Don't copy it blindly, and don't flash anything you haven't checked is the right image.</blockquote>
 
             <img class="deco" src="../assets/images/blog/xpg-fix/qwen.jpg" width="65%" alt="Meme: smug anime girl labeled Qwen 3.8 27B telling an annoyed girl labeled Opus 4.6 that she's smarter and can run on your computer, next to a benchmark bar chart">
             <p class="credit">art by <a href="https://x.com/Kedr_bit">Kedr (@Kedr_bit)</a></p>
@@ -45,6 +53,10 @@
               <li>The drive was on firmware <b>3.2.J.JE</b>, and the fix was <b>3.2.J.PJ</b>.</li>
               <li>Under Linux, the drive only appeared after booting with <code>nvme_core.multipath=0</code>.</li>
             </ul>
+
+            <img class="deco" src="../assets/images/blog/xpg-fix/toolbox.webp" width="90%" alt="ADATA SSD ToolBox with an empty Active Drive list: it doesn't see the XPG drive at all">
+            <p class="credit">the ToolBox, not seeing the drive at all</p>
+
             <p>What started all this was a forum post (in Spanish) that my friend found. It says drives on firmware <b>3.2.J.P0</b> go read-only after the July Windows Update, and that flashing <b>3.2.J.PJ</b> with the ADATA ToolBox revives them, as long as you plug the dead drive into a working PC as a secondary drive. Another user in the thread posted a CrystalDiskInfo screenshot of the same thing, with the "Media has been placed in Read Only Mode" warning.</p>
             
             <img class="deco" src="../assets/images/blog/xpg-fix/post.webp" width="100%" alt="the solotodo forum post about the read-only bug">
