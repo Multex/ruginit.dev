@@ -215,10 +215,9 @@ const COVERS = [
 // ---------------------------------------------------------------------
 //  88x31 BUTTONS (random page + sidebar)
 //  put the image in assets/buttons/ and the path in img
+//  while this list is empty, the buttons panels are hidden everywhere.
+//  example (remove the // to use it):
+//  { img: "assets/buttons/linux.gif", alt: "linux", url: "https://kernel.org" },
 // ---------------------------------------------------------------------
 const BUTTONS = [
-  { img: "", alt: "88x31", url: "" },
-  { img: "", alt: "88x31", url: "" },
-  { img: "", alt: "88x31", url: "" },
-  { img: "", alt: "88x31", url: "" },
 ];

@@ -48,11 +48,16 @@ function renderSidebar() {
     ? panel("visitors", `<img class="counter" src="${COUNTER}" alt="visitor counter" loading="lazy">`)
     : "";
 
+  // hidden until BUTTONS in content.js has at least one button
+  const buttons = BUTTONS.length
+    ? panel("buttons", `<div class="badges">${BUTTONS.map(renderButton).join("")}</div>`)
+    : "";
+
   return `
     ${panel("elsewhere", `<div class="links">${socials}</div>`)}
     ${panel("now", now)}
     ${quote}
-    ${panel("buttons", `<div class="badges">${BUTTONS.map(renderButton).join("")}</div>`)}
+    ${buttons}
     ${counter}`;
 }
 
@@ -145,5 +150,10 @@ document.querySelectorAll("[data-list]").forEach((el) => {
   const list = LISTS[el.dataset.list];
   if (!list) return;
   const items = list.items.slice(0, Number(el.dataset.limit) || undefined);
+  // an empty buttons list hides its whole panel instead of saying "nothing here yet"
+  if (!items.length && el.dataset.list === "buttons") {
+    el.closest("section").hidden = true;
+    return;
+  }
   el.innerHTML = items.length ? items.map(list.render).join("") : `<p class="empty">nothing here yet...</p>`;
 });
