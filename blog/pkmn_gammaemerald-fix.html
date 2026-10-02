@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>fixing Pokemon Gamma Emerald save bug · ruginit</title>
+  <link rel="icon" href="../assets/images/ruginit.gif">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body data-page="blog" data-root="../">
+  <div class="wrap">
+    <div id="header"></div>
+
+    <div class="grid">
+      <main>
+        <section class="panel">
+          <div class="panel-title"><span>~ blog</span><span>2026-10-02</span></div>
+          <article class="panel-body prose">
+
+            <!-- ============ YOUR POST STARTS HERE ============ -->
+            <h1>Pokemon Gamma Emerald: fix for the stuck in loading screen</h1>
+            <div class="meta">2026-10-02 · #games #pokemon #claude<br>the fix itself: 2026-09-12, about 20 minutes</div>
+
+            <!-- TL;DR box: for people who just want their save back -->
+            <div class="tldr">
+              <div class="label">tl;dr: just give me my save back</div>
+              <p><b>Why:</b> you saved inside a building (for me, the Slateport Pokemon Center) and the game waits forever for the floor to load.<br>
+              <b>Fix:</b> move your position in the save to the Pokémon Center's respawn tile. You can do it in the browser with the <a href="https://pge.angehell.com/">pge save editor</a>, no code:</p>
+              <ol>
+                <li><b>Back up</b> the whole <code>%LOCALAPPDATA%\PokemonEmerald\Saved\.ged</code> folder.</li>
+                <li>Open the biggest <code>.dat</code> in there (~1.7 MB) in pge.</li>
+                <li>Go to <code>root</code> &gt; <code>properties</code>. There you can find <code>PlayerLocation_0</code> and <code>LastPokeCenterTile_0</code>.</li>
+                <li>Look at <code>LastPokeCenterTile_0</code> and write down its <b>X_0</b> and <b>Y_0</b>.</li>
+                <li>In <code>PlayerLocation_0</code>, set <b>x = X_0 × 64</b> and <b>y = Y_0 × 64</b>. Don't touch z. The ×64 matters: <code>PlayerLocation</code> is in world units, the tile isn't. Example with my save:
+<pre><code>LastPokeCenterTile_0  X_0 = -541    Y_0 = 2294    ← read these
+
+PlayerLocation_0      x = -34048    y = 146624    ← before (stuck)
+                      x = -34624    y = 146816    ← after: -541×64, 2294×64
+                      z = 222.67…                 ← leave it</code></pre></li>
+                <li>Download the modified save, put it back in <code>.ged</code> with the <b>exact same file name</b>, load the game, and save again <b>outside</b>.</li>
+              </ol>
+              <p><b>Tested:</b> I did this with pge on a copy of my old stuck save and it loaded fine. The first time, I did the same edit with a custom script instead (that's the rest of this post).</p>
+            </div>
+
+            <p>I was ~12 hours into <b>Pokemon Gamma Emerald</b> (the Unreal Engine fan remake), saved inside the <b>Slateport Pokemon Center</b>, restarted the game by accident, and... infinite loading screen. Forever. Forums and some people on the game's Discord server said it could be fixed by moving your position in the save to somewhere outside the Pokémon Center, and that mods had done it for other people. But nobody answered me, and I had no idea how to edit the save.</p>
+
+            <img class="deco" src="../assets/images/blog/gamma-fix/discordss.png" width="55%" alt="my 'Stuck in loading screen' post in the Gamma Emerald Discord, with no replies">
+
+            <p>I was hoping to get some help but yea...</p>
+            <video class="deco" src="../assets/images/blog/gamma-fix/incrediboy.mp4" autoplay loop muted playsinline width="50%"></video>
+            <p class="credit">actual feeling</p>
+
+
+            <p>So I opened <b>Claude Code</b> in the save folder and asked it to look around. This post is what it did, step by step, because honestly it was cool to watch and maybe it helps someone with the same problem.</p>
+
+            <img class="deco" src="../assets/images/blog/gamma-fix/claudish.webp" width="65%" alt="Meme titled 'Opus 5 speaking perfect Claudish': a smug anime girl in an Opus 5 shirt gives a long speech full of words like load-bearing, canonical and failure mode, while a confused girl labeled User-chan says 'What...?'">
+            <p class="credit">art by <a href="https://x.com/Kedr_bit">Kedr (@Kedr_bit)</a></p>
+
+            <blockquote class="warn">Editing saves can break them. Make a backup of the whole save folder before touching anything, and keep it until you've played a while on the fixed save.</blockquote>
+
+            <h2>Where the save lives</h2>
+            <p>The wiki says saves are in <code>Saved\SaveGames\Slot1.sav</code>, but my version (<b>v1.13.1</b> when I wrote this) didn't have that at all. Instead there's a hidden folder:</p>
+            <pre><code>%LOCALAPPDATA%\PokemonEmerald\Saved\.ged\*.dat
+
+# on Linux with Proton / umu, inside the prefix:
+drive_c/users/steamuser/AppData/Local/PokemonEmerald/Saved/.ged/</code></pre>
+            <p>There were 5 <code>.dat</code> files with random-looking names.</p>
+
+            <h2>Step 1: what even is a .dat</h2>
+            <p>Every file started with the bytes <code>GES1</code>, and the rest looked like pure noise, so it was encrypted. Claude searched online and found two community save editors on GitHub: <a href="https://github.com/AngeHell47/Pokemon-Gamma-Emerald-Save-Editor">pge by AngeHell47</a> (the one behind <a href="https://pge.angehell.com/">pge.angehell.com</a>) and <a href="https://github.com/CalRL/gammaeditor">gammaeditor by CalRL</a>. It cloned them and read pge's source, which already knows how to open these files. The format is:</p>
+            <ul>
+              <li><code>0x00</code>: the text <code>GES1</code></li>
+              <li><code>0x04</code>: version (1)</li>
+              <li><code>0x08</code>: size of the decrypted data</li>
+              <li><code>0x0C</code>: SHA-1 of the decrypted data (20 bytes, an integrity check)</li>
+              <li><code>0x20</code>: the actual save, encrypted with <b>AES-256-ECB</b></li>
+            </ul>
+            <p>The key is in pge's <code>lib/save.php</code>. I'm not pasting it here, go give them the visit. Decrypting is short:</p>
+            <pre><code>import struct, hashlib
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+
+KEY = bytes.fromhex("...")   # GES_KEY_HEX from pge's lib/save.php
+
+raw = open("the_save.dat", "rb").read()
+assert raw[:4] == b"GES1"
+version, plain_size = struct.unpack("&lt;II", raw[4:12])
+
+d = Cipher(algorithms.AES(KEY), modes.ECB()).decryptor()
+plain = (d.update(raw[32:]) + d.finalize())[:plain_size]
+print("checksum ok:", hashlib.sha1(plain).digest() == raw[12:32])</code></pre>
+            <p>Inside each one there's a slot name and then a normal Unreal Engine save (<b>GVAS</b>). The 5 files were <code>PokemonSaveSlot</code> (the big one, ~1.7 MB, that's the real save), <code>QuestSlot</code>, <code>GiftSlot</code>, <code>GEBerrySlot</code> and <code>GEOptions</code>.</p>
+            <p>First good news: <b>all 5 passed the SHA-1 check</b>. The save wasn't corrupted. My 12 hours, my pokemons and my 3 badges were all still there.</p>
+
+            <h2>Step 2: finding why it doesn't load</h2>
+            <p>pge also ships <code>uesave</code>, a tool that turns GVAS saves into JSON. With that, the save was readable, and these fields stood out right away:</p>
+            <pre><code>CurrentMapName   = MAP_Hoenn_Persistant
+SavedRoutePath   = /Game/BPS/ROUTES/Route_PokeCenter_Slateport
+bIsInside        = true
+PlayerLocation   = x -34048, y 146624, z 222.67
+LastPokeCenterTile = X -541, Y 2294</code></pre>
+            <p>So the game knows I'm <i>inside</i> the Slateport Pokémon Center. The game's own <a href="https://undreamedpanic.itch.io/gamma-emerald-demo/devlog/945486/demo-v2101">devlog</a> talks about loading screens waiting for "the floor" to be ready, and about having to hand-place collisions. Our guess: the tile I saved on never confirms its floor, so the loading screen waits forever. That matches what people on Discord said: move the player and it loads.</p>
+            <p>Claude also noticed that the coordinates are exact multiples of 64, so <b>1 tile = 64 Unreal units</b>. My position was tile (-532, 2291).</p>
+            <p>(Side quest that went nowhere: it tried to get the list of all maps from the game's <code>.pak</code> file, but that's encrypted too and the key isn't easy to find, so it dropped that and moved on.)</p>
+
+            <h2>Step 3: the JSON trap</h2>
+            <p>The easy way would be: save → JSON → edit → back to save. Claude checked that before using it, by converting to JSON and straight back <i>without changing anything</i>, and comparing. The result was <b>431 bytes different</b>. Same size, but a bunch of float values got rounded in the trip through JSON. Probably harmless, but it's my save, so no.</p>
+            <p>Instead it wrote a small script (<code>gedtool.py</code>) that walks the GVAS properties and only changes the exact bytes of the fields you ask for. To prove it was safe, it "patched" the save with the values that were already there. The output was <b>byte-for-byte identical</b> to the original.</p>
+            <p>Small fun detail: to know how booleans are stored, it flipped <code>bIsInside</code> through uesave and diffed the result. Exactly one byte changed: <code>0x10</code> = true, <code>0x00</code> = false.</p>
+
+            <h2>Step 4: two fixes, smallest first</h2>
+            <p>It made two versions of the save:</p>
+            <ul>
+              <li><b>A</b>: only move <code>PlayerLocation</code> to <code>LastPokeCenterTile</code> (-541, 2294). That's the respawn point the game itself saved, so it's a tile the game already trusts. I was stuck on tile (-532, 2291), so it's only 9 tiles over and 3 up/down. Nothing else changed.</li>
+              <li><b>B</b>: same as A, plus <code>bIsInside = false</code> and an empty route, so the game loads just the Hoenn overworld.</li>
+            </ul>
+            <p>Both were checked by decrypting them again and reading them with uesave (all 48 properties still there). It installed <b>A</b> first and left a tiny script so I could switch:</p>
+            <pre><code>./usar.sh A          # smallest fix
+./usar.sh B          # if A doesn't work
+./usar.sh ORIGINAL   # put the original back</code></pre>
+            <p>(That script and <code>gedtool.py</code> were made just for my save and only live on my PC, they're not something to download. If you're stuck, use the TL;DR at the top.)</p>
+            <p>(The script refuses to run if the game is open. That check kept detecting <i>Claude's own command</i> as "the game", because the command text contained the game's name. It fixed it with the <code>pgrep -f "[P]okemonEmerald"</code> trick.)</p>
+
+            <h2>Step 5: it worked</h2>
+            <p>Opened the game, loaded, and I was standing in the world again. Fix A was enough. Total time from my first message to the fix being installed was about 20 minutes. Claude's last advice: save again <b>outdoors</b> as soon as possible, because the save still says I'm inside, and saving outside clears that.</p>
+
+            <!-- screenshot of the game loading fine here -->
+
+            <h2>What I learned</h2>
+            <ul>
+              <li><b>Back up first.</b> Before anything else. Every time.</li>
+              <li>Community tools are gold. The key and the format were already figured out by people who share their stuff. Credit to pge and gammaeditor.</li>
+              <li>"Convert to JSON and back" sounds lossless, and it isn't always. Test it.</li>
+              <li>Smallest change first. A fix that moves you a few tiles is better than one that rewrites half your save.</li>
+              <li>Don't save inside Pokémon Centers in this game. lol.</li>
+            </ul>
+
+            <p>If your Gamma Emerald save is stuck loading and you're not sure what to do, tell me and I'll try to help.</p>
+
+            <img class="deco" src="../assets/images/blog/gamma-fix/pkmn.webp" width="100%" alt="Gamma Emerald title screen (v1.13.1): the player and her team of pixel-art Pokémon in the rain, Rayquaza glowing in the background">
+
+            <!-- ============ YOUR POST ENDS HERE ============ -->
+
+            <a class="back" href="../blog.html">← back to all posts</a>
+          </article>
+        </section>
+      </main>
+
+      <aside id="sidebar"></aside>
+    </div>
+
+    <div id="footer"></div>
+  </div>
+
+  <script src="../js/content.js"></script>
+  <script src="../js/site.js"></script>
+</body>
+</html>
