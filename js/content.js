@@ -103,7 +103,7 @@ const POSTS = [
     title: "Pokemon Gamma Emerald: fix for the stuck in loading screen",
     date: "2026-10-02",
     tags: ["games", "pokemon", "claude"],
-    url: "blog/pkmn_gammaemerald-fix.html",
+    url: "blog/gammaemerald-fix.html",
   },
 ];
 

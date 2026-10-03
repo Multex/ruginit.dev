@@ -78,6 +78,8 @@ img { max-width: 100%; }
    LAYOUT: main column + sidebar
    ===================================================================== */
 .grid { display: grid; grid-template-columns: minmax(0, 1fr) 250px; gap: 20px; margin-top: 8px; }
+/* Let grid columns shrink even when a post contains long code lines. */
+.grid > main, .grid > aside { min-width: 0; }
 
 /* =====================================================================
    PANELS: the boxes with a little title bar
@@ -190,7 +192,8 @@ img { max-width: 100%; }
 .prose h3 { color: var(--pink); font-size: 16px; margin: 22px 0 6px; }
 .prose p, .prose li { line-height: 1.75; }
 .prose ul, .prose ol { padding-left: 22px; margin: 0 0 12px; }
-.prose img, .prose video { display: block; margin: 16px auto; border: 1px solid var(--border); }
+.prose { overflow-wrap: anywhere; }
+.prose img, .prose video { display: block; max-width: 100%; height: auto; margin: 16px auto; border: 1px solid var(--border); }
 .prose blockquote { margin: 16px 0; padding: 4px 14px; border-left: 3px solid var(--pink); color: var(--muted); }
 /* warning quote: <blockquote class="warn">...</blockquote> */
 .prose blockquote.warn { border-left-color: var(--warn); background: #ff8a5c14; color: var(--text); padding: 10px 14px; }
@@ -200,7 +203,7 @@ img { max-width: 100%; }
 .prose .tldr .label { font: 11px var(--font-pixel); color: var(--purple); margin-bottom: 8px; }
 .prose .tldr p:last-child, .prose .tldr ol:last-child { margin-bottom: 0; }
 .prose code { font: 13px var(--font-mono); background: var(--panel-head); padding: 1px 5px; color: var(--pink); }
-.prose pre { background: #0a0810; border: 1px solid var(--border); padding: 12px 14px; overflow-x: auto; }
+.prose pre { background: #0a0810; border: 1px solid var(--border); padding: 12px 14px; overflow-x: auto; overflow-wrap: normal; }
 .prose pre code { background: none; padding: 0; color: var(--text); }
 /* small centered line under an image, for credits: <p class="credit">art by ...</p> */
 .prose .credit { margin-top: -8px; text-align: center; font: 12px var(--font-mono); color: var(--dim); }
@@ -217,7 +220,7 @@ footer { margin-top: 32px; padding-top: 12px; border-top: 1px solid var(--border
    PHONES
    ===================================================================== */
 @media (max-width: 760px) {
-  .grid { grid-template-columns: 1fr; }
+  .grid { grid-template-columns: minmax(0, 1fr); }
   .cards, .stack { grid-template-columns: 1fr; }
   .intro { grid-template-columns: 1fr; }
   .media-row .deco { width: 100%; margin-bottom: 10px; }
