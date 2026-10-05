@@ -175,6 +175,10 @@ img { max-width: 100%; }
    SIZE: change the 48% (of the panel's width). 48% = two fill the row, smaller = smaller */
 .media-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 2%; }
 .media-row .deco { margin: 0; width: 48%; }
+.media-row > figure { margin: 0; width: 48%; min-width: 0; }
+.media-row > figure .deco { width: 100%; }
+.credit { margin: 8px 0 0; text-align: center; font: 12px/1.6 var(--font-mono); color: var(--dim); overflow-wrap: anywhere; }
+.credit a { text-underline-offset: 3px; }
 
 /* text on the left, image on the right (like the hackermans on projects) */
 /* put the text inside a <div>, then the image after it */
@@ -224,5 +228,7 @@ footer { margin-top: 32px; padding-top: 12px; border-top: 1px solid var(--border
   .cards, .stack { grid-template-columns: 1fr; }
   .intro { grid-template-columns: 1fr; }
   .media-row .deco { width: 100%; margin-bottom: 10px; }
+  .media-row > figure { width: 100%; margin-bottom: 10px; }
+  .media-row > figure .deco { margin-bottom: 0; }
   .name { font-size: 28px; }
 }
