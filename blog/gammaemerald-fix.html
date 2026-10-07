@@ -45,10 +45,13 @@
 
 PlayerLocation_0      x = -34048    y = 146624    ← before (stuck)
                       x = -34624    y = 146816    ← after: -541×64, 2294×64
-                      z = 222.67…                 ← leave it</code></pre></li>
+                      z = 222.67…                 ← leave it</code></pre>
+                  <p><b>Small note:</b> after multiplying by 64, x or y might already match what's in <code>PlayerLocation_0</code>. That's fine, leave that coordinate as it is and change the one that's different. Someone else tried the fix and it worked with only y changing; their x already matched.</p>
+                </li>
                 <li>Download the modified save, put it back in <code>.ged</code> with the <b>exact same file name</b>, load the game, and save again <b>outside</b>.</li>
               </ol>
               <p><b>Tested:</b> I did this with pge on a copy of my old stuck save and it loaded fine. The first time, I did the same edit with a custom script instead (that's the rest of this post).</p>
+              <p><b>Update (2026-10-07):</b> another player confirmed that the fix worked on their save too! Still not a guarantee for every loading issue, but good to know it helped someone else get back into the game.</p>
             </div>
 
             <p>I was ~12 hours into <b>Pokemon Gamma Emerald</b> (the Unreal Engine fan remake), saved inside the <b>Slateport Pokemon Center</b>, restarted the game by accident, and... infinite loading screen. Forever. Forums and some people on the game's Discord server said it could be fixed by moving your position in the save to somewhere outside the Pokemon Center, and that mods had done it for other people. But nobody answered me, and I had no idea how to edit the save.</p>
